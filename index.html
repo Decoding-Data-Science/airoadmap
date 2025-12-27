@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Guild: Interactive Learning Pathways</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfbf7; /* Warm neutral background */
+            color: #1f2937;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af; 
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            height: 300px;
+            margin: 0 auto;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .active-tab-tech {
+            border-bottom: 2px solid #0f766e;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .active-tab-nontech {
+            border-bottom: 2px solid #c2410c;
+            color: #c2410c;
+            font-weight: 600;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutral Foundation (#fdfbf7) with Teal (#0f766e) for Technical accents and Burnt Orange (#c2410c) for Non-Technical accents. -->
+    <!-- Application Structure Plan: 
+         1. Header: Toggle logic fixed to use camelCase matching data keys.
+         2. Main Dashboard: Dynamically injected links from the user-provided Nas.io mapping.
+         3. Interactive Elements: Navigation, Filtering, and Direct External Linking.
+    -->
+    <!-- Visualization & Content Choices:
+         - Charts are updated to reflect the specific content counts from the provided list.
+         - Cards now feature a direct "Access Content" call to action.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navigation / Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-graduation-cap text-teal-700 text-2xl mr-3"></i>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">AI Guild Navigator</h1>
+                        <p class="text-xs text-gray-500">Interactive Curriculum Explorer</p>
+                    </div>
+                </div>
+                <div class="flex space-x-4">
+                    <button id="btn-tech" onclick="switchPath('technical')" class="px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        <i class="fas fa-code mr-2"></i>Technical Path
+                    </button>
+                    <button id="btn-nontech" onclick="switchPath('nonTechnical')" class="px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">
+                        <i class="fas fa-briefcase mr-2"></i>Business Path
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Column: Path Description & Progress -->
+        <div class="lg:col-span-8 space-y-8">
+            
+            <!-- Path Introduction Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 id="path-title" class="text-2xl font-bold text-gray-800">Technical Engineering & Data Science</h2>
+                    <span id="path-badge" class="px-3 py-1 bg-teal-100 text-teal-800 text-xs font-semibold rounded-full">Builder Track</span>
+                </div>
+                <p id="path-desc" class="text-gray-600 mb-6"></p>
+                
+                <!-- Interactive Stepper -->
+                <div class="relative">
+                    <div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -z-10 transform -translate-y-1/2"></div>
+                    <div id="stepper-container" class="flex justify-between items-center w-full"></div>
+                </div>
+            </div>
+
+            <!-- Phase Content Section -->
+            <div id="phase-content-area" class="space-y-6">
+                <div id="phase-header" class="border-l-4 pl-4 py-2">
+                    <h3 id="current-phase-title" class="text-xl font-bold text-gray-800"></h3>
+                    <p id="current-phase-desc" class="text-sm text-gray-500"></p>
+                </div>
+
+                <!-- Filters -->
+                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                    <span>Filter:</span>
+                    <button onclick="filterContent('all')" class="hover:text-teal-600 font-medium">All</button>
+                    <span>/</span>
+                    <button onclick="filterContent('Course')" class="hover:text-teal-600 font-medium">Courses</button>
+                    <span>/</span>
+                    <button onclick="filterContent('Resource')" class="hover:text-teal-600 font-medium">Resources</button>
+                </div>
+
+                <!-- Dynamic Grid of Cards -->
+                <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Stats & Career Mastery -->
+        <div class="lg:col-span-4 space-y-8">
+            
+            <!-- Visualization Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-chart-pie mr-2 text-teal-600"></i> Curriculum Insights
+                </h3>
+                
+                <!-- Chart 1: Resource Types -->
+                <div class="mb-6">
+                    <h4 class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Resource Distribution</h4>
+                    <div class="chart-container">
+                        <canvas id="resourceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Skill Radar -->
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Skill Focus Area</h4>
+                    <div class="chart-container">
+                        <canvas id="skillChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Career Mastery Section -->
+            <div class="bg-slate-50 rounded-xl border border-slate-200 p-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center">
+                    <i class="fas fa-rocket mr-2 text-indigo-600"></i> Career Mastery
+                </h3>
+                <div id="career-list" class="space-y-3"></div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400 text-sm">
+            <p>&copy; 2025 AI Guild Navigator. Interactive Dashboard.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA STORE WITH LINKS ---
+        const pathData = {
+            technical: {
+                title: "Technical Engineering & Data Science",
+                description: "A rigorous journey designed for 'builders.' Master foundational data skills, engineer Large Language Models, and create autonomous Agentic systems.",
+                badge: "Builder Track",
+                color: "teal",
+                skillData: [90, 80, 40, 60, 85],
+                phases: [
+                    {
+                        id: 1,
+                        title: "Data Foundations & Version Control",
+                        desc: "Master the fundamental data tools and collaboration standards.",
+                        items: [
+                            { type: "DS Course", title: "Basic SQL for AI/Data Science", link: "https://nas.io/aiguild/digital-files/ezve", desc: "Learn to query and manage the data that fuels AI." },
+                            { type: "DS Course", title: "Advanced Python", link: "https://nas.io/aiguild/digital-files/yirf", desc: "Master the primary language of AI development." },
+                            { type: "DS Course", title: "Master Excel for Data Science", link: "https://nas.io/aiguild/digital-files/mism", desc: "Essential for rapid data prototyping." },
+                            { type: "Course", title: "Git Essential", link: "https://nas.io/aiguild/digital-files/wvvh", desc: "Learn version control to collaborate on codebases." },
+                            { type: "Resource", title: "Essential SQL Documents", link: "https://nas.io/aiguild/digital-files/nxmy", desc: "Handy reference guides for SQL syntax." },
+                            { type: "Resource", title: "Sample Datasets", link: "https://nas.io/aiguild/digital-files/codi", desc: "Practical datasets for training your models." }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Machine Learning & Visualization",
+                        desc: "Understand prediction mechanics and data storytelling.",
+                        items: [
+                            { type: "Resource", title: "Machine Learning Documents", link: "https://nas.io/aiguild/digital-files/kfpy", desc: "Theoretical and practical ML documentation." },
+                            { type: "DS Course", title: "Basic PowerBI for Data Science", link: "https://nas.io/aiguild/digital-files/bjer", desc: "Visualize insights for stakeholders." },
+                            { type: "Recording", title: "AI & Data Science Projects", link: "https://nas.io/aiguild/digital-files/gdud", desc: "Implementation of real-world projects." }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: "Generative AI & LLM Engineering",
+                        desc: "Deep dive into the architecture of modern AI.",
+                        items: [
+                            { type: "Course", title: "Large Language Model", link: "https://nas.io/aiguild/digital-files/btcn", desc: "Understand LLM architectures." },
+                            { type: "Course", title: "Prompt Engineering for Developers", link: "https://nas.io/aiguild/digital-files/pqsa", desc: "Interact with models programmatically." },
+                            { type: "Course", title: "Generative AI using Gemini", link: "https://nas.io/aiguild/digital-files/xghu", desc: "Explore Google’s AI ecosystem." },
+                            { type: "Resource", title: "Generative AI and LLM Resources", link: "https://nas.io/aiguild/digital-files/wmna", desc: "Curated LLM technical guides." }
+                        ]
+                    },
+                    {
+                        id: 4,
+                        title: "Advanced Orchestration & Agents",
+                        desc: "Building complex, autonomous agentic systems.",
+                        items: [
+                            { type: "Course", title: "Master Langchain", link: "https://nas.io/aiguild/digital-files/yltk", desc: "Industry-standard LLM application framework." },
+                            { type: "Course", title: "LangGraph", link: "https://nas.io/aiguild/digital-files/fait", desc: "Master stateful, multi-agent workflows." },
+                            { type: "Course", title: "AI Agents & Agentic AI Mastery", link: "https://nas.io/aiguild/digital-files/fqux", desc: "Build autonomous agents." },
+                            { type: "Course", title: "Generative AI for Cybersecurity", link: "https://nas.io/aiguild/digital-files/nviu", desc: "AI for defensive and offensive security." }
+                        ]
+                    }
+                ]
+            },
+            nonTechnical: {
+                title: "Non-Technical Business & Management",
+                description: "Leverage AI for ROI and organizational strategy. Designed for managers, entrepreneurs, and time-constrained executives.",
+                badge: "Enabler Track",
+                color: "orange",
+                skillData: [30, 50, 95, 70, 60],
+                phases: [
+                    {
+                        id: 1,
+                        title: "AI Literacy for Professionals",
+                        desc: "Understand AI capabilities without writing code.",
+                        items: [
+                            { type: "Course", title: "Generative AI for Busy People", link: "https://nas.io/aiguild/digital-files/kmho", desc: "High-level overview for time-constrained leaders." },
+                            { type: "Course", title: "AI @ Work", link: "https://nas.io/aiguild/digital-files/ebzr", desc: "Integrate AI into your corporate workflow." },
+                            { type: "Ebook", title: "Prompt Engineering Mastery", link: "https://nas.io/aiguild/digital-files/apqy", desc: "The art of the 'Perfect Prompt'." }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        title: "Strategic Implementation",
+                        desc: "Driving business value and leading change.",
+                        items: [
+                            { type: "Course", title: "Generative AI for Business", link: "https://nas.io/aiguild/digital-files/udkn", desc: "Focus on ROI and use-case strategy." },
+                            { type: "Recording", title: "Outcome Based Workshops", link: "https://nas.io/aiguild/digital-files/sgps", desc: "Practical business results sessions." },
+                            { type: "Recording", title: "MasterClass Series", link: "https://nas.io/aiguild/digital-files/xacb", desc: "Insights from industry leaders." },
+                            { type: "Resource", title: "Knowledge Shorts", link: "https://nas.io/aiguild/digital-files/hgvs", desc: "Quick-consumption industry insights." }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        title: "Networking & Growth",
+                        desc: "Building presence in the AI ecosystem.",
+                        items: [
+                            { type: "Course", title: "Linkedin Growth Mastery", link: "https://nas.io/aiguild/digital-files/ytuf", desc: "Build a brand as an AI leader." },
+                            { type: "Recording", title: "Meetup Sessions", link: "https://nas.io/aiguild/digital-files/mayg", desc: "Community networking and trends." }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        const careerData = [
+            { id: 1, type: "Strategy", title: "How to get AI & Data Job", link: "https://nas.io/aiguild/digital-files/iqia" },
+            { id: 2, type: "Webinar", title: "Career Webinar Series", link: "https://nas.io/aiguild/digital-files/lfrz" },
+            { id: 3, type: "LinkedIn", title: "Profile Optimization", link: "https://nas.io/aiguild/digital-files/jnqk" },
+            { id: 4, type: "Resume", title: "Ready-to-use Template", link: "https://nas.io/aiguild/digital-files/viad" },
+            { id: 5, type: "Resume", title: "Resume Samples", link: "https://nas.io/aiguild/digital-files/ikjg" }
+        ];
+
+        // --- STATE & DOM ---
+        let currentPath = 'technical';
+        let currentPhaseIndex = 0;
+        let activeFilter = 'all';
+
+        const els = {
+            btnTech: document.getElementById('btn-tech'),
+            btnNonTech: document.getElementById('btn-nontech'),
+            pathTitle: document.getElementById('path-title'),
+            pathBadge: document.getElementById('path-badge'),
+            pathDesc: document.getElementById('path-desc'),
+            stepperContainer: document.getElementById('stepper-container'),
+            phaseTitle: document.getElementById('current-phase-title'),
+            phaseDesc: document.getElementById('current-phase-desc'),
+            phaseHeader: document.getElementById('phase-header'),
+            cardsGrid: document.getElementById('cards-grid'),
+            careerList: document.getElementById('career-list'),
+            resourceCtx: document.getElementById('resourceChart').getContext('2d'),
+            skillCtx: document.getElementById('skillChart').getContext('2d')
+        };
+
+        let resourceChart, skillChart;
+
+        function initCharts() {
+            resourceChart = new Chart(els.resourceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Courses', 'Resources', 'Recordings'],
+                    datasets: [{ data: [1, 1, 1], backgroundColor: ['#0d9488', '#f59e0b', '#6366f1'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } }
+            });
+
+            skillChart = new Chart(els.skillCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Tech', 'Data', 'Business', 'Creative', 'Logic'],
+                    datasets: [{ label: 'Focus', data: [0,0,0,0,0], backgroundColor: 'rgba(13, 148, 136, 0.2)', borderColor: '#0d9488' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { r: { beginAtZero: true, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function switchPath(pathKey) {
+            currentPath = pathKey;
+            currentPhaseIndex = 0;
+            
+            if (pathKey === 'technical') {
+                els.btnTech.className = "px-4 py-2 rounded-md text-sm font-medium transition-colors active-tab-tech bg-teal-50";
+                els.btnNonTech.className = "px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors";
+            } else {
+                els.btnTech.className = "px-4 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors";
+                els.btnNonTech.className = "px-4 py-2 rounded-md text-sm font-medium transition-colors active-tab-nontech bg-orange-50";
+            }
+
+            renderPathView();
+            updateCharts(pathKey);
+        }
+
+        function renderPathView() {
+            const data = pathData[currentPath];
+            const themeColor = data.color;
+            
+            els.pathTitle.innerText = data.title;
+            els.pathDesc.innerText = data.description;
+            els.pathBadge.innerText = data.badge;
+            els.pathBadge.className = `px-3 py-1 bg-${themeColor}-100 text-${themeColor}-800 text-xs font-semibold rounded-full`;
+
+            renderStepper(data.phases, themeColor);
+            renderPhase(currentPhaseIndex);
+        }
+
+        function renderStepper(phases, themeColor) {
+            let html = '';
+            phases.forEach((_, index) => {
+                const isActive = index === currentPhaseIndex;
+                const activeClass = isActive 
+                    ? `bg-${themeColor}-600 text-white border-${themeColor}-600 ring-4 ring-${themeColor}-100` 
+                    : `bg-white text-gray-500 border-gray-300 hover:border-${themeColor}-400`;
+                
+                html += `
+                    <button onclick="changePhase(${index})" class="flex flex-col items-center group focus:outline-none z-10">
+                        <div class="w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${activeClass}">${index + 1}</div>
+                        <span class="mt-2 text-xs font-medium ${isActive ? `text-${themeColor}-700` : 'text-gray-400'} hidden sm:block">Phase ${index + 1}</span>
+                    </button>`;
+            });
+            els.stepperContainer.innerHTML = html;
+        }
+
+        function changePhase(index) {
+            currentPhaseIndex = index;
+            renderPathView();
+        }
+
+        function renderPhase(index) {
+            const phase = pathData[currentPath].phases[index];
+            const themeColor = pathData[currentPath].color;
+            
+            els.phaseTitle.innerText = `Phase ${index + 1}: ${phase.title}`;
+            els.phaseDesc.innerText = phase.desc;
+            els.phaseHeader.style.borderColor = themeColor === 'teal' ? '#0d9488' : '#c2410c';
+
+            let cardsHtml = '';
+            const filteredItems = phase.items.filter(item => {
+                if (activeFilter === 'all') return true;
+                return item.type.includes(activeFilter);
+            });
+
+            filteredItems.forEach(item => {
+                const icon = getIconForType(item.title);
+                cardsHtml += `
+                    <div class="bg-white p-5 rounded-lg border border-gray-200 card-hover flex flex-col justify-between h-full">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">${item.type}</span>
+                                <i class="${icon} text-gray-400"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-gray-800 mb-2 leading-tight">${item.title}</h4>
+                            <p class="text-sm text-gray-600 mb-4">${item.desc}</p>
+                        </div>
+                        <div class="flex flex-col space-y-3">
+                            <a href="${item.link}" target="_blank" class="w-full text-center py-2 bg-${themeColor}-600 text-white text-sm font-semibold rounded-md hover:bg-${themeColor}-700 transition-colors">
+                                Access Content <i class="fas fa-external-link-alt ml-1 text-[10px]"></i>
+                            </a>
+                            <button onclick="toggleComplete(this)" class="text-xs text-gray-400 hover:text-${themeColor}-600 self-end transition-colors">
+                                <i class="far fa-circle mr-1"></i> Mark Done
+                            </button>
+                        </div>
+                    </div>`;
+            });
+            els.cardsGrid.innerHTML = cardsHtml || `<div class="col-span-2 text-center py-8 text-gray-400">No content found for this filter.</div>`;
+        }
+
+        function updateCharts(pathKey) {
+            const data = pathData[pathKey];
+            let counts = { Course: 0, Resource: 0, Recording: 0 };
+            data.phases.forEach(p => p.items.forEach(i => {
+                if (i.type.includes('Course')) counts.Course++;
+                else if (i.type.includes('Recording')) counts.Recording++;
+                else counts.Resource++;
+            }));
+
+            resourceChart.data.datasets[0].data = [counts.Course, counts.Resource, counts.Recording];
+            skillChart.data.datasets[0].data = data.skillData;
+            skillChart.data.datasets[0].borderColor = data.color === 'teal' ? '#0d9488' : '#c2410c';
+            skillChart.update();
+            resourceChart.update();
+        }
+
+        function getIconForType(title) {
+            const t = title.toLowerCase();
+            if (t.includes('sql')) return 'fas fa-database';
+            if (t.includes('python')) return 'fas fa-code';
+            if (t.includes('excel') || t.includes('powerbi')) return 'fas fa-chart-bar';
+            if (t.includes('recording') || t.includes('workshop')) return 'fas fa-video';
+            if (t.includes('prompt') || t.includes('llm')) return 'fas fa-brain';
+            return 'fas fa-file-alt';
+        }
+
+        function filterContent(filter) {
+            activeFilter = filter;
+            renderPhase(currentPhaseIndex);
+        }
+
+        function toggleComplete(btn) {
+            const icon = btn.querySelector('i');
+            const themeColor = pathData[currentPath].color;
+            if (icon.classList.contains('far')) {
+                icon.className = `fas fa-check-circle mr-1 text-${themeColor}-600`;
+                btn.innerHTML = `<i class="fas fa-check-circle mr-1"></i> Completed`;
+            } else {
+                icon.className = 'far fa-circle mr-1';
+                btn.innerHTML = `<i class="far fa-circle mr-1"></i> Mark Done`;
+            }
+        }
+
+        function renderCareer() {
+            let html = '';
+            careerData.forEach(item => {
+                html += `
+                    <a href="${item.link}" target="_blank" class="flex items-start space-x-3 p-3 bg-white rounded border border-slate-200 hover:border-indigo-400 transition-all cursor-pointer block">
+                        <div class="flex-shrink-0 mt-1"><i class="fas fa-star text-yellow-400"></i></div>
+                        <div>
+                            <h5 class="text-sm font-semibold text-slate-700">${item.title}</h5>
+                            <span class="text-xs text-slate-400 uppercase tracking-wider">${item.type}</span>
+                        </div>
+                    </a>`;
+            });
+            els.careerList.innerHTML = html;
+        }
+
+        window.onload = function() {
+            initCharts();
+            renderCareer();
+            switchPath('technical');
+        };
+    </script>
+</body>
+</html>
