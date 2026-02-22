@@ -26,6 +26,7 @@
             font-family: 'Inter', sans-serif;
             background-color: #fdfbf7; 
             color: #1f2937;
+            overflow-x: hidden;
         }
 
         .chart-container {
@@ -44,8 +45,8 @@
             transition: all 0.3s ease;
         }
         .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
         }
 
         .active-tab-tech {
@@ -60,25 +61,33 @@
             font-weight: 700;
         }
 
-        .cta-gradient {
-            background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
         }
     </style>
-    <!-- Chosen Palette: DDS Professional - Warm Neutrals (#fdfbf7), DDS Teal (#0f766e), and Achievement Orange (#c2410c). -->
+    <!-- Chosen Palette: DDS Official - Warm Neutrals (#fdfbf7), DDS Teal (#0f766e), and Achievement Orange (#c2410c). -->
     <!-- Application Structure Plan:
-         1. Interactive Dashboard: Centralized navigation using a 12-column grid.
-         2. Path-Driven Stepper: A 4-phase technical journey and 3-phase business journey.
-         3. Dynamic Course Injection: JavaScript-driven rendering of all 32 products.
-         4. Global Career Sidebar: Persistent access to career-readiness tools.
-         5. Action-Oriented Footer: Added a "Start Building Now" global CTA to drive conversions.
+         1. Interactive Dashboard: Centralized navigation using a responsive 12-column grid.
+         2. Path-Driven Stepper: 4-phase technical journey and 3-phase business journey.
+         3. Dynamic Course Injection: JavaScript logic rendering all 34+ products including new Statistics and RAG entries.
+         4. Global Career Sidebar: Persistent access to career-readiness tools and external events.
+         5. Action-Oriented Footer: Added a "Start Building Now" global CTA to drive community engagement.
     -->
     <!-- Visualization & Content Choices:
-         - Doughnut Chart: Resource distribution (Courses vs Recordings vs Resources).
-         - Radar Chart: Skill focus area per path (Logic, Data, Business, Creativity, Architecture).
+         - Doughnut Chart: Resource distribution showing content types.
+         - Radar Chart: Skill focus area per path.
+         - NO SVG / NO MERMAID: All icons via FontAwesome and charts via Chart.js Canvas.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col custom-scrollbar">
 
     <!-- Top Branding & Navigation -->
     <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -94,10 +103,10 @@
                 
                 <div class="flex items-center space-x-2 md:space-x-6">
                     <button id="btn-tech" onclick="switchPath('technical')" class="px-3 py-2 rounded-md text-sm font-bold transition-all">
-                        <i class="fas fa-terminal mr-2"></i>Technical
+                        <i class="fas fa-terminal mr-2 text-teal-600"></i>Technical
                     </button>
                     <button id="btn-nontech" onclick="switchPath('nonTechnical')" class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition-all">
-                        <i class="fas fa-user-tie mr-2"></i>Business
+                        <i class="fas fa-user-tie mr-2 text-orange-600"></i>Business
                     </button>
                     <a href="https://decoding-data-science.github.io/aiguild/" target="_blank" class="hidden lg:flex items-center text-xs font-bold text-gray-400 hover:text-teal-600 transition-colors uppercase tracking-widest">
                         Community <i class="fas fa-external-link-alt ml-1"></i>
@@ -112,7 +121,7 @@
         <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-[11px] md:text-xs font-bold tracking-wider uppercase">
             <div class="flex items-center mb-2 md:mb-0">
                 <span class="bg-orange-500 text-white px-2 py-0.5 rounded-full mr-3 animate-pulse">Live</span>
-                Career Talks & Meetups: Join the next session
+                Career Talks & Meetups: Attend our next live session
             </div>
             <a href="https://nas.io/artificialintelligence/products?product=EVENT&tab=UPCOMING" target="_blank" class="bg-white text-teal-900 px-5 py-2 rounded-lg hover:bg-orange-50 transition-all shadow-sm">
                 Register Free <i class="fas fa-calendar-check ml-2"></i>
@@ -143,7 +152,7 @@
                 </div>
             </div>
 
-            <!-- Phase Header -->
+            <!-- Learning Content Area -->
             <div id="phase-content-area" class="space-y-6">
                 <div id="phase-header" class="border-l-4 pl-8 py-3 transition-all">
                     <h3 id="current-phase-title" class="text-2xl font-black text-gray-800 tracking-tight"></h3>
@@ -154,11 +163,11 @@
                 <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
 
                 <!-- Content Completion CTA -->
-                <div class="mt-12 p-8 bg-teal-50 rounded-3xl border border-teal-100 text-center">
-                    <h4 class="text-xl font-bold text-teal-900 mb-3">Ready to transform your career?</h4>
-                    <p class="text-teal-700 text-sm mb-6 font-medium">Join 90+ members gaining hands-on industry experience and building AI products.</p>
-                    <a href="https://nas.io/aiguild/" target="_blank" class="inline-flex items-center px-8 py-4 bg-teal-700 text-white font-black uppercase tracking-widest rounded-2xl hover:bg-teal-800 transition-all shadow-xl hover:shadow-teal-200">
-                        Start Building Now <i class="fas fa-rocket ml-3"></i>
+                <div class="mt-12 p-10 bg-teal-50 rounded-[40px] border border-teal-100 text-center shadow-inner">
+                    <h4 class="text-2xl font-black text-teal-900 mb-4 tracking-tight">Ready to build your AI career?</h4>
+                    <p class="text-teal-700 text-sm mb-8 font-medium max-w-lg mx-auto leading-relaxed">Join 90+ members gaining hands-on experience by building actual AI products and landing dream jobs.</p>
+                    <a href="https://nas.io/aiguild/" target="_blank" class="inline-flex items-center px-10 py-5 bg-teal-700 text-white font-black uppercase tracking-[0.15em] rounded-2xl hover:bg-teal-800 transition-all shadow-xl hover:shadow-teal-200 group">
+                        Start Building Now <i class="fas fa-rocket ml-3 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
                     </a>
                 </div>
             </div>
@@ -171,7 +180,7 @@
             <!-- Curriculum Visualization -->
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                 <h3 class="text-lg font-black text-gray-800 mb-8 flex items-center uppercase tracking-wider">
-                    <i class="fas fa-chart-pie mr-4 text-teal-600"></i> Curriculum Stats
+                    <i class="fas fa-chart-pie mr-4 text-teal-600"></i> Learning Insights
                 </h3>
                 
                 <div class="space-y-10">
@@ -189,7 +198,7 @@
                 <h3 class="text-lg font-black text-orange-900 mb-2 flex items-center uppercase tracking-wider">
                     <i class="fas fa-trophy mr-4"></i> Challenges
                 </h3>
-                <p class="text-[10px] text-orange-700 mb-6 font-bold uppercase tracking-widest">Ongoing & Always-On</p>
+                <p class="text-[10px] text-orange-700 mb-6 font-bold uppercase tracking-widest">Active & Continuous</p>
                 
                 <div class="space-y-4">
                     <a href="https://nas.io/aiguild/challenges/aiguildorientation/home?tab=about" target="_blank" class="flex items-center justify-between p-4 bg-white rounded-2xl border border-orange-200 hover:shadow-lg transition-all group">
@@ -227,90 +236,92 @@
             <div class="flex justify-center space-x-10 text-gray-300 text-2xl">
                 <a href="https://nas.io/aiguild" target="_blank" class="hover:text-teal-600 transition-colors"><i class="fab fa-linkedin"></i></a>
                 <a href="https://decoding-data-science.github.io/aiguild/" target="_blank" class="hover:text-teal-600 transition-colors"><i class="fas fa-globe"></i></a>
-                <a href="https://nas.io/aiguild/" target="_blank" class="hover:text-teal-600 transition-colors"><i class="fas fa-portal-exit"></i></a>
+                <a href="https://nas.io/aiguild/" target="_blank" class="hover:text-teal-600 transition-colors"><i class="fas fa-rocket"></i></a>
             </div>
         </div>
     </footer>
 
     <script>
-        // --- DATA STORE (ALL 32 PRODUCTS) ---
+        // --- DATA STORE (ALL 34 PRODUCTS) ---
         const pathData = {
             technical: {
                 title: "AI Engineer & Data Scientist",
-                description: "Master foundational coding, advanced SQL, predictive modeling, and the engineering of autonomous multi-agent systems.",
+                description: "Master foundational coding, advanced mathematics, predictive modeling, and the engineering of autonomous multi-agent systems.",
                 badge: "Technical Builder",
                 color: "teal",
                 skillData: [95, 90, 20, 50, 95],
                 phases: [
                     {
-                        id: 1, title: "Foundations", desc: "Start here for core coding and data skills.",
+                        id: 1, title: "Foundations", desc: "Core coding, statistics, and data management.",
                         items: [
                             { type: "Course", title: "Python Essential (FastTrack)", link: "https://nas.io/aiguild/courses/python-essential-fasttrack-lms-access", desc: "Rapid entry into Python programming basics." },
-                            { type: "DS Course", title: "Basic SQL for AI", link: "https://nas.io/aiguild/digital-files/ezve", desc: "Master the data language of AI." },
-                            { type: "DS Course", title: "Advanced Python", link: "https://nas.io/aiguild/digital-files/yirf", desc: "Deep dive into scalable AI logic." },
+                            { type: "DS Course", title: "Basic SQL for AI", link: "https://nas.io/aiguild/digital-files/ezve", desc: "Master the data language of AI and ML." },
+                            { type: "Course", title: "Basic Statistics for AI & ML", link: "https://academy.decodingdatascience.com/basicstatisticsforaiml", desc: "Foundational math and statistics for data science." },
+                            { type: "DS Course", title: "Advanced Python", link: "https://nas.io/aiguild/digital-files/yirf", desc: "Deep dive into scalable AI logic and systems." },
                             { type: "DS Course", title: "Excel for Data Science", link: "https://nas.io/aiguild/digital-files/mism", desc: "Data analysis and reporting essentials." },
-                            { type: "Course", title: "Git Essentials", link: "https://nas.io/aiguild/digital-files/wvvh", desc: "Industry-standard version control." },
-                            { type: "Resource", title: "Essential SQL Docs", link: "https://nas.io/aiguild/digital-files/nxmy", desc: "Quick-reference SQL syntax guides." },
-                            { type: "Resource", title: "Sample Datasets", link: "https://nas.io/aiguild/digital-files/codi", desc: "Hands-on data for ML training." }
+                            { type: "Course", title: "Git Essentials", link: "https://nas.io/aiguild/digital-files/wvvh", desc: "Industry-standard version control for builders." },
+                            { type: "Resource", title: "Essential SQL Docs", link: "https://nas.io/aiguild/digital-files/nxmy", desc: "Quick-reference SQL syntax and commands." },
+                            { type: "Resource", title: "Sample Datasets", link: "https://nas.io/aiguild/digital-files/codi", desc: "Hands-on data for ML model training." }
                         ]
                     },
                     {
-                        id: 2, title: "Data Science Core", desc: "Machine learning and visualization.",
+                        id: 2, title: "Data Science Core", desc: "Machine learning, visualization, and projects.",
                         items: [
-                            { type: "Resource", title: "Machine Learning Docs", link: "https://nas.io/aiguild/digital-files/kfpy", desc: "In-depth ML concepts and theory." },
-                            { type: "DS Course", title: "Basic PowerBI", link: "https://nas.io/aiguild/digital-files/bjer", desc: "Enterprise visualization mastery." },
-                            { type: "Recording", title: "AI & DS Projects", link: "https://nas.io/aiguild/digital-files/gdud", desc: "End-to-end implementation sessions." },
-                            { type: "Resource", title: "Knowledge Shorts", link: "https://nas.io/aiguild/digital-files/hgvs", desc: "Bite-sized technical insights." }
+                            { type: "Resource", title: "Machine Learning Docs", link: "https://nas.io/aiguild/digital-files/kfpy", desc: "In-depth ML concepts, math, and theory." },
+                            { type: "DS Course", title: "Basic PowerBI", link: "https://nas.io/aiguild/digital-files/bjer", desc: "Enterprise-grade visualization and BI." },
+                            { type: "Recording", title: "AI & DS Project Sessions", link: "https://nas.io/aiguild/digital-files/gdud", desc: "End-to-end implementation of real projects." },
+                            { type: "Resource", title: "Knowledge Shorts", link: "https://nas.io/aiguild/digital-files/hgvs", desc: "Bite-sized technical insights for quick learning." }
                         ]
                     },
                     {
-                        id: 3, title: "Gen AI Mastery", desc: "LLMs, Prompting, and Gemini.",
+                        id: 3, title: "Gen AI & LLMs", desc: "Mastering the world of Large Language Models.",
                         items: [
-                            { type: "Course", title: "Large Language Models", link: "https://nas.io/aiguild/digital-files/btcn", desc: "Deep dive into LLM architectures." },
-                            { type: "Course", title: "Prompt Eng for Devs", link: "https://nas.io/aiguild/digital-files/pqsa", desc: "Programmatic interaction with models." },
-                            { type: "Course", title: "Gen AI with Gemini", link: "https://nas.io/aiguild/digital-files/xghu", desc: "Leverage Google's multimodal AI." },
-                            { type: "Resource", title: "Gen AI & LLM Library", link: "https://nas.io/aiguild/digital-files/wmna", desc: "Advanced research materials." }
+                            { type: "Course", title: "Large Language Models", link: "https://nas.io/aiguild/digital-files/btcn", desc: "Deep dive into LLM architectures and training." },
+                            { type: "Recording", title: "RAG (Retrieval-Augmented Gen)", link: "https://nas.io/aiguild/products/sgps", desc: "Advanced RAG implementations for AI products." },
+                            { type: "Course", title: "Prompt Eng for Devs", link: "https://nas.io/aiguild/digital-files/pqsa", desc: "Programmatic interaction and optimization." },
+                            { type: "Course", title: "Gen AI with Gemini", link: "https://nas.io/aiguild/digital-files/xghu", desc: "Leverage Google's multimodal AI ecosystem." },
+                            { type: "Resource", title: "Gen AI & LLM Library", link: "https://nas.io/aiguild/digital-files/wmna", desc: "Advanced research materials and tools." }
                         ]
                     },
                     {
-                        id: 4, title: "Agentic Engineering", desc: "Building autonomous AI systems.",
+                        id: 4, title: "Agentic Engineering", desc: "Building stateful, autonomous systems.",
                         items: [
-                            { type: "Course", title: "Master Langchain", link: "https://nas.io/aiguild/digital-files/yltk", desc: "Orchestration for LLM applications." },
+                            { type: "Course", title: "Master Langchain", link: "https://nas.io/aiguild/digital-files/yltk", desc: "Orchestration for LLM-powered applications." },
                             { type: "Course", title: "LangGraph", link: "https://nas.io/aiguild/digital-files/fait", desc: "State-driven multi-agent workflows." },
-                            { type: "Course", title: "AI Agents Mastery", link: "https://nas.io/aiguild/digital-files/fqux", desc: "Architecture for autonomous agents." },
-                            { type: "Course", title: "Cybersecurity & AI", link: "https://nas.io/aiguild/digital-files/nviu", desc: "Protecting systems using AI." }
+                            { type: "Course", title: "AI Agents Mastery", link: "https://nas.io/aiguild/digital-files/fqux", desc: "Architecture for autonomous AI agents." },
+                            { type: "Course", title: "Gen AI for Cybersecurity", link: "https://nas.io/aiguild/digital-files/nviu", desc: "Defending systems using AI models." }
                         ]
                     }
                 ]
             },
             nonTechnical: {
                 title: "AI Business Strategist",
-                description: "Focus on AI literacy, organizational strategy, and personal branding for the AI-driven economy.",
+                description: "Focus on AI literacy, organizational strategy, and personal branding for the modern AI-driven economy.",
                 badge: "Business Leader",
                 color: "orange",
                 skillData: [30, 40, 95, 80, 70],
                 phases: [
                     {
-                        id: 1, title: "Professional Literacy", desc: "Integrating AI into your daily work.",
+                        id: 1, title: "Corporate Literacy", desc: "Integrating AI into your professional workflow.",
                         items: [
-                            { type: "Course", title: "AI @ Work", link: "https://nas.io/aiguild/digital-files/ebzr", desc: "Maximize corporate productivity." },
-                            { type: "Course", title: "AI for Busy People", link: "https://nas.io/aiguild/digital-files/kmho", desc: "Quick overview for executives." },
-                            { type: "Ebook", title: "Prompt Eng Mastery", link: "https://nas.io/aiguild/digital-files/apqy", desc: "Perfect prompting for business." }
+                            { type: "Course", title: "AI @ Work", link: "https://nas.io/aiguild/digital-files/ebzr", desc: "Maximize daily corporate productivity." },
+                            { type: "Course", title: "AI for Busy People", link: "https://nas.io/aiguild/digital-files/kmho", desc: "Quick overview for busy executives." },
+                            { type: "Ebook", title: "Prompt Eng Mastery", link: "https://nas.io/aiguild/digital-files/apqy", desc: "Strategic prompting for business leaders." }
                         ]
                     },
                     {
-                        id: 2, title: "Strategic Impact", desc: "Strategy, ROI, and outcomes.",
+                        id: 2, title: "Strategic Impact", desc: "Strategy, ROI, and measurable outcomes.",
                         items: [
                             { type: "Course", title: "Gen AI for Business", link: "https://nas.io/aiguild/digital-files/udkn", desc: "Strategy and measurement frameworks." },
-                            { type: "Recording", title: "Outcome Workshops", link: "https://nas.io/aiguild/digital-files/sgps", desc: "Achieving specific business results." },
-                            { type: "Recording", title: "MasterClass Series", link: "https://nas.io/aiguild/digital-files/xacb", desc: "Leadership in the AI era." }
+                            { type: "Recording", title: "Outcome Workshops", link: "https://nas.io/aiguild/digital-files/sgps", desc: "Achieving specific business results sessions." },
+                            { type: "Recording", title: "MasterClass Series", link: "https://nas.io/aiguild/digital-files/xacb", desc: "Leadership lessons in the AI age." }
                         ]
                     },
                     {
-                        id: 3, title: "Growth & Visibility", desc: "Building your community and brand.",
+                        id: 3, title: "Branding & Growth", desc: "Building presence and authority.",
                         items: [
-                            { type: "Course", title: "Linkedin Growth Mastery", link: "https://nas.io/aiguild/digital-files/ytuf", desc: "Thought leadership branding." },
-                            { type: "Recording", title: "Meetup Sessions", link: "https://nas.io/aiguild/digital-files/mayg", desc: "Networking and community trends." }
+                            { type: "Course", title: "Linkedin Growth Mastery", link: "https://nas.io/aiguild/digital-files/ytuf", desc: "Thought leadership and personal branding." },
+                            { type: "Recording", title: "Meetup Sessions", link: "https://nas.io/aiguild/digital-files/mayg", desc: "Networking and latest community trends." }
                         ]
                     }
                 ]
@@ -401,7 +412,7 @@
             phases.forEach((_, index) => {
                 const isActive = index === currentPhaseIndex;
                 const activeClass = isActive 
-                    ? `bg-${themeColor}-600 text-white border-${themeColor}-600 ring-4 ring-${themeColor}-100 scale-110` 
+                    ? `bg-${themeColor}-600 text-white border-${themeColor}-600 ring-4 ring-${themeColor}-100 scale-110 shadow-lg` 
                     : `bg-white text-gray-400 border-gray-100 hover:border-${themeColor}-400`;
                 
                 html += `
@@ -433,14 +444,14 @@
                         <div class="relative z-10">
                             <div class="flex justify-between items-start mb-6">
                                 <span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest bg-gray-50 text-gray-400 border border-gray-100">${item.type}</span>
-                                <i class="${icon} text-gray-200 text-xl group-hover:text-${themeColor}-200 transition-colors"></i>
+                                <i class="${icon} text-gray-200 text-xl group-hover:text-${themeColor}-300 transition-colors"></i>
                             </div>
                             <h4 class="text-lg font-black text-gray-900 mb-2 leading-tight">${item.title}</h4>
                             <p class="text-xs text-gray-500 leading-relaxed mb-8 font-medium">${item.desc}</p>
                         </div>
                         <div class="relative z-10">
                             <a href="${item.link}" target="_blank" class="w-full text-center py-3.5 bg-${themeColor}-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-${themeColor}-800 transition-all shadow-lg active:scale-95 block">
-                                Access Now <i class="fas fa-arrow-right ml-2 text-[8px]"></i>
+                                Access Module <i class="fas fa-arrow-right ml-2 text-[8px]"></i>
                             </a>
                         </div>
                     </div>`;
@@ -466,10 +477,10 @@
 
         function getIcon(title) {
             const t = title.toLowerCase();
-            if (t.includes('sql') || t.includes('excel')) return 'fas fa-table';
+            if (t.includes('sql') || t.includes('excel') || t.includes('statistics')) return 'fas fa-calculator';
             if (t.includes('python') || t.includes('git')) return 'fas fa-code';
-            if (t.includes('masterclass') || t.includes('recording') || t.includes('workshop')) return 'fas fa-video';
-            if (t.includes('prompt') || t.includes('ai') || t.includes('llm')) return 'fas fa-microchip';
+            if (t.includes('masterclass') || t.includes('recording') || t.includes('workshop')) return 'fas fa-play-circle';
+            if (t.includes('prompt') || t.includes('ai') || t.includes('llm') || t.includes('rag')) return 'fas fa-microchip';
             if (t.includes('linkedin')) return 'fab fa-linkedin';
             return 'fas fa-book';
         }
@@ -482,8 +493,8 @@
                         <div class="w-8 h-8 rounded-xl bg-teal-500/20 flex items-center justify-center flex-shrink-0 group-hover:rotate-12 transition-transform">
                             <i class="fas fa-star text-teal-400 text-xs"></i>
                         </div>
-                        <div>
-                            <h5 class="text-xs font-black text-white leading-tight">${item.title}</h5>
+                        <div class="overflow-hidden">
+                            <h5 class="text-xs font-black text-white leading-tight truncate">${item.title}</h5>
                             <span class="text-[8px] text-teal-500 uppercase font-black tracking-widest">${item.type}</span>
                         </div>
                     </a>`;
